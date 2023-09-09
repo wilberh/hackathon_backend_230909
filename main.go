@@ -21,9 +21,18 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-const apiTranslationURL = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=pt"
-const subscriptionKey = "138aff8d95b748468016c66926bb09c7"
-const location = "eastus"
+type TranslationResponse struct {
+	Translations []struct {
+		Text string `json:"text"`
+		To   string `json:"to"`
+	} `json:"translations"`
+}
+
+const (
+	apiTranslationURL = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=pt"
+	subscriptionKey   = "138aff8d95b748468016c66926bb09c7"
+	location          = "eastus"
+)
 
 func main() {
 	// Start the web server using net/http
@@ -64,41 +73,43 @@ func answerQuestion(w http.ResponseWriter, r *http.Request) {
 		textToBeTranslated := Payload{Text: string(body)}
 
 		// translate the phrase using our function translateTexts and return the translated phrase
-		translatedPhrase, err := translateTexts(textToBeTranslated.Text)
+		translatedPhrase, err := translateText(textToBeTranslated.Text)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(ResponseError{Message: "Internal Server Error"})
 			return
 		}
+		fmt.Println("Translated phrase:", translatedPhrase)
 
 		// Write the response body
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(Response{Message: translatedPhrase})
 
-		// Write the same body back as the response
-		w.WriteHeader(http.StatusOK)
-		w.Write(body)
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(ResponseError{Message: "Method not allowed"})
 	}
 }
 
-func translateTexts(phrase string) (string, error) {
-	payload := Payload{Text: "I would really like to drive your car around the block a few times."}
+func translateText(text string) (string, error) {
+
+	payload := []struct {
+		Text string `json:"Text"`
+	}{
+		{Text: text},
+	}
+
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		return "", fmt.Errorf("Error marshaling JSON payload: %v", err)
 	}
-	// create the http request to translate the phrase
-	req, err := http.NewRequest("POST", apiTranslationURL, bytes.NewBuffer(payloadBytes))
+
+	req, err := http.NewRequest("POST", apiTranslationURL, bytes.NewReader(payloadBytes))
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		return "", fmt.Errorf("Error creating HTTP request: %v", err)
 	}
-	// set the request headers
+
 	req.Header.Add("Accept", "*/*")
-	// req.Header.Add("User-Agent", "Thunder Client (https://www.thunderclient.com)")
 	req.Header.Add("Ocp-Apim-Subscription-Key", subscriptionKey)
 	req.Header.Add("Ocp-Apim-Subscription-Region", location)
 	req.Header.Add("Content-Type", "application/json")
@@ -106,26 +117,27 @@ func translateTexts(phrase string) (string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		return "", fmt.Errorf("Error sending HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// read the response body
+	fmt.Println("Response Status:", resp.Status)
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		return "", fmt.Errorf("Error reading response body: %v", err)
 	}
 
-	// parse the response body
-	var response []Response
-	err = json.Unmarshal(body, &response)
+	var translationResponse []TranslationResponse
+	err = json.Unmarshal(body, &translationResponse)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		return "", fmt.Errorf("Error unmarshaling JSON response: %v", err)
 	}
 
-	// return the translated phrase
-	return response[0].Message, nil
+	if len(translationResponse) > 0 && len(translationResponse[0].Translations) > 0 {
+		fmt.Println("Translation:", translationResponse[0].Translations[0].Text)
+		return translationResponse[0].Translations[0].Text, nil
+	}
+
+	return "", fmt.Errorf("Translation not found in the response")
 }
