@@ -9,8 +9,11 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+const rssURL = "https://www.ted.com/feeds/talks.rss"
+
 // GetEnglishSentences returns the first four English sentences from the RSS feed
-func GetEnglishSentences(rssURL string) (*dto.FeedResult, error) {
+func GetEnglishSentences() (*dto.FeedResult, error) {
+
 	// analyze the RSS feed
 	parser := gofeed.NewParser()
 

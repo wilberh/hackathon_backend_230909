@@ -27,6 +27,9 @@ func main() {
 	// Get endpoint to receive the english sentences
 	http.HandleFunc("/sentences", handlers.GetEnglishSentencesHandler)
 
+	// Post endpoint to receive the number of questions and the language of the questions
+	http.HandleFunc("/game", handlers.GameHandler)
+
 	// Start the web server
 	fmt.Println("API is running on port 9999")
 	http.ListenAndServe(":9999", nil)

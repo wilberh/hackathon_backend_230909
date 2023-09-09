@@ -10,9 +10,8 @@ import (
 )
 
 func GetEnglishSentencesHandler(w http.ResponseWriter, r *http.Request) {
-	rssURL := "https://www.ted.com/feeds/talks.rss"
 
-	result, err := feed.GetEnglishSentences(rssURL)
+	result, err := feed.GetEnglishSentences()
 	if err != nil {
 		fmt.Println("Error getting English sentences:", err)
 		w.WriteHeader(http.StatusInternalServerError)
