@@ -33,7 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checking PWD
-      run: pwd
+      id: workingdir
+      run: echo "::set-output name=wrkdir::$(pwd)"
     - name: Deploying Application on EC2
       uses: appleboy/ssh-action@master
       with:
@@ -42,6 +43,4 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?
         script: |
-          pwd
-          ll
-          ./docker-ec2-deploy.sh
+          ${{ steps.workingdir.outputs.wrkdir }}/docker-ec2-deploy.sh
