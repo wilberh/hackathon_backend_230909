@@ -3,10 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
-	"github.com/mbuchoff/hackathon_backend_230909/translate"
+	"github.com/mbuchoff/hackathon_backend_230909/internal/handlers"
 )
 
 type Payload struct {
@@ -34,47 +33,9 @@ func main() {
 	})
 
 	// Post endpoint to receive the phrase to be translated
-	http.HandleFunc("/question", answerQuestion)
+	http.HandleFunc("/question", handlers.AnswerQuestion)
 
 	// Start the web server
 	fmt.Println("API is running on port 9999")
 	http.ListenAndServe(":9999", nil)
-}
-
-func answerQuestion(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		// Set the content type header
-		w.Header().Set("Content-Type", "application/json")
-		// allow CORS
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
-		// Get the request body
-		defer r.Body.Close() // Close the body when we're done
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(ResponseError{Message: "Internal Server Error"})
-			return
-		}
-		fmt.Println(string(body))
-		// extract the phrase from the request body and attach it to the payload and send to transtate the text
-		textToBeTranslated := Payload{Text: string(body)}
-
-		// translate the phrase using our function translateTexts and return the translated phrase
-		translatedPhrase, err := translate.TranslateText(textToBeTranslated.Text)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(ResponseError{Message: "Internal Server Error"})
-			return
-		}
-		fmt.Println("Translated phrase:", translatedPhrase)
-
-		// Write the response body
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(Response{Message: translatedPhrase})
-
-	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(ResponseError{Message: "Method not allowed"})
-	}
 }

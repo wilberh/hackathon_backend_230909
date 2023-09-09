@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/mbuchoff/hackathon_backend_230909/translate"
+	"github.com/mbuchoff/hackathon_backend_230909/internal/services/translate"
 )
 
 func TestTranslateTextFunction(t *testing.T) {
