@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -34,14 +35,21 @@ func main() {
 
 // TODO: Implement the answerQuestion function to work with the /question endpoint in POST method
 func answerQuestion(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		responseEncoded := []byte(Response{TransLatedPhrase: "Hello API"}.TransLatedPhrase)
-
+	if r.Method == http.MethodPost {
+		// Set the content type header
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		// return the response in json format
 
-		json.NewEncoder(w).Encode(responseEncoded)
+		// Get the request body
+		defer r.Body.Close() // Close the body when we're done
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(ResponseError{Message: "Internal Server Error"})
+			return
+		}
+		// Write the same body back as the response
+		w.WriteHeader(http.StatusOK)
+		w.Write(body)
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(ResponseError{Message: "Method not allowed"})
