@@ -5,21 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/mbuchoff/hackathon_backend_230909/internal/dto"
 	"github.com/mbuchoff/hackathon_backend_230909/internal/handlers"
 )
-
-type Payload struct {
-	// TODO: Phrases to be translated
-	Text string `json:"Text"`
-}
-
-type Response struct {
-	Message string `json:"translated_phrase"`
-}
-
-type ResponseError struct {
-	Message string `json:"message"`
-}
 
 func main() {
 	// Start the web server using net/http
@@ -29,7 +17,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 
 		// Write the response body
-		json.NewEncoder(w).Encode(Response{Message: "OK"})
+		json.NewEncoder(w).Encode(dto.Response{Message: "OK"})
 	})
 
 	// Post endpoint to receive the phrase to be translated
