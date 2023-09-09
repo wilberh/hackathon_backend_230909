@@ -40,4 +40,5 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?
         script: |
+          cd ~/.scripts
           ./docker-ec2-deploy.sh
