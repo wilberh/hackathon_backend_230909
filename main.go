@@ -15,6 +15,10 @@ type Response struct {
 	TransLatedPhrase string `json:"translated_phrase"`
 }
 
+type ResponseError struct {
+	Message string `json:"message"`
+}
+
 func main() {
 	// Start the web server using net/http
 
@@ -40,6 +44,7 @@ func answerQuestion(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(responseEncoded)
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(ResponseError{Message: "Method not allowed"})
 	}
 }
 
