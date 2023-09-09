@@ -23,6 +23,9 @@ func main() {
 	// Post endpoint to receive the phrase to be translated
 	http.HandleFunc("/question", handlers.AnswerQuestion)
 
+	// Get endpoint to receive the english sentences
+	http.HandleFunc("/sentences", handlers.GetEnglishSentencesHandler)
+
 	// Start the web server
 	fmt.Println("API is running on port 9999")
 	http.ListenAndServe(":9999", nil)

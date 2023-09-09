@@ -16,7 +16,6 @@ func GetEnglishSentences(rssURL string) (*dto.FeedResult, error) {
 		return nil, err
 	}
 
-	// collect the first four English sentences
 	var englishSentences []string
 	for _, item := range feed.Items {
 		if isEnglishSentence(item.Title) {
