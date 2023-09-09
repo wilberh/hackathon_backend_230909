@@ -32,6 +32,8 @@ jobs:
     needs: [build-test]
     runs-on: ubuntu-latest
     steps:
+    - name: Checking PWD
+      run: pwd
     - name: Deploying Application on EC2
       uses: appleboy/ssh-action@master
       with:
@@ -40,5 +42,6 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?
         script: |
-          cd ~/.scripts
+          pwd
+          ll
           ./docker-ec2-deploy.sh
