@@ -1,11 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/mbuchoff/hackathon_backend_230909/translate"
 )
 
 type Payload struct {
@@ -20,19 +21,6 @@ type Response struct {
 type ResponseError struct {
 	Message string `json:"message"`
 }
-
-type TranslationResponse struct {
-	Translations []struct {
-		Text string `json:"text"`
-		To   string `json:"to"`
-	} `json:"translations"`
-}
-
-const (
-	apiTranslationURL = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=pt"
-	subscriptionKey   = "138aff8d95b748468016c66926bb09c7"
-	location          = "eastus"
-)
 
 func main() {
 	// Start the web server using net/http
@@ -73,7 +61,7 @@ func answerQuestion(w http.ResponseWriter, r *http.Request) {
 		textToBeTranslated := Payload{Text: string(body)}
 
 		// translate the phrase using our function translateTexts and return the translated phrase
-		translatedPhrase, err := translateText(textToBeTranslated.Text)
+		translatedPhrase, err := translate.TranslateText(textToBeTranslated.Text)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(ResponseError{Message: "Internal Server Error"})
@@ -89,55 +77,4 @@ func answerQuestion(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(ResponseError{Message: "Method not allowed"})
 	}
-}
-
-func translateText(text string) (string, error) {
-
-	payload := []struct {
-		Text string `json:"Text"`
-	}{
-		{Text: text},
-	}
-
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		return "", fmt.Errorf("Error marshaling JSON payload: %v", err)
-	}
-
-	req, err := http.NewRequest("POST", apiTranslationURL, bytes.NewReader(payloadBytes))
-	if err != nil {
-		return "", fmt.Errorf("Error creating HTTP request: %v", err)
-	}
-
-	req.Header.Add("Accept", "*/*")
-	req.Header.Add("Ocp-Apim-Subscription-Key", subscriptionKey)
-	req.Header.Add("Ocp-Apim-Subscription-Region", location)
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("Error sending HTTP request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	fmt.Println("Response Status:", resp.Status)
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("Error reading response body: %v", err)
-	}
-
-	var translationResponse []TranslationResponse
-	err = json.Unmarshal(body, &translationResponse)
-	if err != nil {
-		return "", fmt.Errorf("Error unmarshaling JSON response: %v", err)
-	}
-
-	if len(translationResponse) > 0 && len(translationResponse[0].Translations) > 0 {
-		fmt.Println("Translation:", translationResponse[0].Translations[0].Text)
-		return translationResponse[0].Translations[0].Text, nil
-	}
-
-	return "", fmt.Errorf("Translation not found in the response")
 }

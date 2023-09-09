@@ -1,11 +1,15 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/mbuchoff/hackathon_backend_230909/translate"
+)
 
 func TestTranslateTextFunction(t *testing.T) {
 	textToTranslate := "Hello"
 
-	translatedText, err := translateText(textToTranslate)
+	translatedText, err := translate.TranslateText(textToTranslate)
 
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
