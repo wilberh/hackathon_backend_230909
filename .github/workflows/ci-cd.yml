@@ -50,5 +50,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?  #cd ${{ steps.workingdir.outputs.wrkdir }}
         script: |
-          cd ~/.scripts
-          ./docker-ec2-deploy.sh
+          source ./docker-ec2-deploy.sh
+    # - name: Run Script
+    #   run: >
+    #     source docker-ec2-deploy.sh
