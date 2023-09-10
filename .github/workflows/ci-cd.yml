@@ -46,7 +46,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.SSH_EC2_IP }}
         REMOTE_USER: ${{ secrets.SSH_EC2_USER }}
         SOURCE: .
-        TARGET: cd ~
+        TARGET: ~${{ secrets.REPO_NAME }}
     - name: Deploying Application on EC2
       uses: appleboy/ssh-action@master
       with:
@@ -56,7 +56,5 @@ jobs:
         script: |
           cd ~
           pwd
-          ls -la
-          mkdir ${{ secrets.REPO_NAME }}
           cd ${{ secrets.REPO_NAME }}
           source ./docker-ec2-deploy.sh
