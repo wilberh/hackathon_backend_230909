@@ -48,7 +48,7 @@ jobs:
         host: ${{ secrets.SSH_EC2_IP }}
         username: ${{ secrets.SSH_EC2_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?
+        # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?  #cd ${{ steps.workingdir.outputs.wrkdir }}
         script: |
-          cd ${{ steps.workingdir.outputs.wrkdir }}
+          cd ~/.scripts
           ./docker-ec2-deploy.sh
