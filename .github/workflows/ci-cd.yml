@@ -46,7 +46,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.SSH_EC2_IP }}
         REMOTE_USER: ${{ secrets.SSH_EC2_USER }}
         SOURCE: .
-        TARGET: $GITHUB_REPOSITORY 
+        TARGET: echo "$GITHUB_REPOSITORY"
     - name: Deploying Application on EC2  #${{ secrets.REPO_NAME }}
       uses: appleboy/ssh-action@master
       with:
