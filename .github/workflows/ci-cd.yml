@@ -46,7 +46,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.SSH_EC2_IP }}
         REMOTE_USER: ${{ secrets.SSH_EC2_USER }}
         SOURCE: .
-        TARGET: ~${{ secrets.REPO_NAME }}
+        TARGET: ${{ secrets.REPO_NAME }}
     - name: Deploying Application on EC2
       uses: appleboy/ssh-action@master
       with:
