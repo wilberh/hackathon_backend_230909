@@ -51,8 +51,6 @@ jobs:
         # passphrase: ${{ secrets.SSH_PASSPHRASE }}  #not needed?  #cd ${{ steps.workingdir.outputs.wrkdir }}
         script: |
           cd ~
-          git checkout develop
-          git fetch --all
-          git reset --hard origin/master
-          git pull origin master
+          git clone ${{ secrets.REPO_HTTPS_URL }}
+          cd ${{ secrets.REPO_NAME }}
           source ./docker-ec2-deploy.sh
