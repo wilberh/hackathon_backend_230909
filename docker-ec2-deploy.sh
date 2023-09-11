@@ -32,4 +32,4 @@ git pull origin develop;
 
 docker compose up -d --build
 
-exit 0;
+# exit 0;
