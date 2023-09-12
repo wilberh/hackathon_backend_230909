@@ -47,13 +47,17 @@ jobs:
         REMOTE_USER: ${{ secrets.SSH_EC2_USER }}
         SOURCE: .
         TARGET: ${{ github.event.repository.name }}
-    - name: Running Script via SSH on EC2
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_EC2_IP }}
-        username: ${{ secrets.SSH_EC2_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
+        SCRIPT_AFTER: |
           cd ~
           cd ${{ github.event.repository.name }}
-          source ./docker-ec2-deploy.sh
+          docker compose up -d --build
+    # - name: Running Script via SSH on EC2
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.SSH_EC2_IP }}
+    #     username: ${{ secrets.SSH_EC2_USER }}
+    #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+    #     script: |
+    #       cd ~
+    #       cd ${{ github.event.repository.name }}
+    #       source ./docker-ec2-deploy.sh
